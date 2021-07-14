@@ -5,7 +5,10 @@
         <BehaviorDescription name="behavior" src="behavior_1" xar="behavior.xar" />
     </BehaviorDescriptions>
     <Dialogs />
-    <Resources />
+    <Resources>
+        <File name="surprise3" src="behavior_1/surprise3.ogg" />
+        <File name="heaven1" src="behavior_1/behavior_1/heaven1.ogg" />
+    </Resources>
     <Topics />
     <IgnoredPaths />
 </Package>

@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<package version="0.0.0" installOnlyAtStartup="false" uuid="aida-bot-eeb321">
+<package uuid="aida-bot-eeb321" version="0.0.0" installOnlyAtStartup="false">
  <names>
-  <name lang="en_US">Untitled</name>
+  <name lang="en_US">AIDA-Bot</name>
  </names>
  <descriptionLanguages>
   <language>en_US</language>
