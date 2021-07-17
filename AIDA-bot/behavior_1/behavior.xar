@@ -15,7 +15,7 @@
       <BehaviorLayer name="behavior_layer1">
         <BehaviorKeyframe name="keyframe1" index="1">
           <Diagram scale="59.4604">
-            <Box name="Speech Reco." id="2" localization="8" tooltip="Recognize a word from a list of words set in the box parameters.&#x0A;&#x0A;V1.1.0&#x0A;" x="302" y="54">
+            <Box name="Speech Reco." id="2" localization="8" tooltip="Recognize a word from a list of words set in the box parameters.&#x0A;&#x0A;V1.1.0&#x0A;" x="147" y="31">
               <bitmap>media/images/box/interaction/ear.png</bitmap>
               <script language="4">
                 <content>
@@ -99,7 +99,7 @@ class MyClass(GeneratedClass):
               <Parameter name="Enable word spotting" inherits_from_parent="0" content_type="0" value="0" default_value="0" tooltip="If this option is not activated the robot will only understand exact expressions. If it is, he will spot the exact expressions even in the middle of a sentence.&#x0A;&#x0A;!!Warning!! This option is only available with the speech recognition module using Nuance (ie in Atom version of the robot)." id="9" />
               <Resource name="Speech recognition" type="Lock" timeout="0" />
             </Box>
-            <Box name="AIDA-bot" id="10" localization="8" tooltip="This box contains a basic python script and can be used to create any python script box you would like.&#x0A;&#x0A;To edit its script, double-click on it." x="139" y="473">
+            <Box name="AIDA-bot" id="10" localization="8" tooltip="This box contains a basic python script and can be used to create any python script box you would like.&#x0A;&#x0A;To edit its script, double-click on it." x="343" y="198">
               <bitmap>media/images/box/box-python-script.png</bitmap>
               <script language="4">
                 <content>
@@ -750,7 +750,10 @@ def choice_list(speak):
         if speak['num'][i] > 0:
             for j in range(len(speak['keys'][i])):
                 message += numbers[n] + ', '
-                message += (speak['keys'][i][j]['name'] if cmd == 0 else speak['keys'][i][j]) + '; '
+                item = speak['keys'][i][j]['name'] if cmd == 0 else speak['keys'][i][j]
+                if (cmd == 1 and i == 3) or (cmd == 0 and i == 0):
+                    item = upper_first(item)
+                message += item + '; '
                 n += 1
             message += ' among the ' + obj_cat[cmd][i] + '. '
     message = message[0: len(message) - 2]
@@ -762,7 +765,10 @@ def homonyms(speak):
     item = speak['item']
     for i in range(len(item)):
         num = 'say ' + numbers[i] + ' for '
-        msg += num + item[i]['name']
+        name = item[i]['name']
+        if speak.get('object') == 'authors':
+            name = upper_first(name)
+        msg += num + name
         if item[i].get('affiliation') is not None:
             msg += homonyms_list[0] + item[i]['affiliation'] + "; "
         elif item[i].get('country') is not None:
@@ -1182,6 +1188,26 @@ def count_query(msg):
 
         # case k2 (multiple results fnd search)
         if msg['result'] == 'k2':
+
+            num_res = 0
+            for i in range(len(msg['num'])):
+                obj = object_categories[i]
+                if not count_legal_queries[sub][obj][0]:
+                    msg['num'][i] = 0
+                    msg['keys'][i] = []
+                num_res += msg['num'][i]
+            if num_res == 0:
+                setMessage('NO_SENSE_MSG')
+                session_reset()
+                return
+            elif num_res == 1:
+                for i in range(len(msg['num'])):
+                    if msg['num'][i] == 1:
+                        session['intent']['slots']['ins'] = msg['keys'][i][0]
+                        session['intent']['level'] = 0
+                        count_query('')
+                        return
+
             session['intent']['items_list'] = msg
             message = choice_list(msg)
             setMessage('ITEM_MSG', {'ins': ins, 'msg': message})
@@ -1190,6 +1216,12 @@ def count_query(msg):
 
         # case ka(homonyms fnd search)
         if msg['result'] == 'ka':
+            obj = msg['object']
+            if not count_legal_queries[sub][obj][0]:
+                setMessage('NO_SENSE_MSG')
+                session_reset()
+                return
+
             session['intent']['homonyms_list'] = msg
             message = homonyms(msg)
             setMessage('HOMONYMS_MSG', {'msg': message, 'obj': homonyms_objects[msg['obj_id'] - 1]})
@@ -1412,6 +1444,26 @@ def list_query(msg):
 
         # k2 case
         if msg['result'] == 'k2':
+
+            num_res = 0
+            for i in range(len(msg['num'])):
+                obj = object_categories[i]
+                if not is_list_legal(sub,obj):
+                    msg['num'][i] = 0
+                    msg['keys'][i] = []
+                num_res += msg['num'][i]
+            if num_res == 0:
+                setMessage('NO_SENSE_MSG')
+                session_reset()
+                return
+            elif num_res == 1:
+                for i in range(len(msg['num'])):
+                    if msg['num'][i] == 1:
+                        session['intent']['slots']['ins'] = msg['keys'][i][0]
+                        session['intent']['level'] = 0
+                        list_query('')
+                        return
+
             session['intent']['items_list'] = msg
             message = choice_list(msg)
             setMessage('ITEM_MSG', {'ins': ins, 'msg': message})
@@ -1420,6 +1472,13 @@ def list_query(msg):
 
         # ka case homonyms
         if msg['result'] == 'ka':
+
+            obj = msg['object']
+            if not is_list_legal(sub,obj):
+                setMessage('NO_SENSE_MSG')
+                session_reset()
+                return
+
             session['intent']['homonyms_list'] = msg
             message = homonyms(msg)
             setMessage('HOMONYMS_MSG', {'msg': message, 'obj': homonyms_objects[msg['obj_id'] - 1]})
@@ -1839,6 +1898,7 @@ def appendMessage(value):
 class MyClass(GeneratedClass):
     def __init__(self):
         GeneratedClass.__init__(self, False)
+        self.ready = True
 
     def onLoad(self):
         #setMessage('WELCOME_MSG')
@@ -1849,6 +1909,8 @@ class MyClass(GeneratedClass):
         pass
 
     def onInput_onStart(self, s):
+        while not self.ready:
+            sleep(0.1)
         cycle(str(s))
         self.speech(str(zora['answer']))
         self.Movement(zora['action'])
@@ -1861,18 +1923,26 @@ class MyClass(GeneratedClass):
     def onInput_onWelcome(self):
         setMessage('WELCOME_MSG')
         self.speech(zora['answer'])
-        self.Movement(zora['action'])]]>
+        self.Movement(zora['action'])
+
+    def onInput_bored_stopped(self):
+        self.ready = True
+
+    def onInput_bored_started(self):
+        self.ready = False]]>
                 </content>
               </script>
               <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
               <Input name="onStart" type="3" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
               <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
               <Input name="onWelcome" type="1" type_size="1" nature="1" inner="0" tooltip="" id="4" />
-              <Output name="onStopped" type="3" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="5" />
-              <Output name="Movement" type="0" type_size="1" nature="2" inner="0" tooltip="" id="6" />
-              <Output name="speech" type="3" type_size="1" nature="2" inner="0" tooltip="" id="7" />
+              <Input name="bored_stopped" type="1" type_size="1" nature="1" inner="0" tooltip="" id="5" />
+              <Input name="bored_starded" type="1" type_size="1" nature="1" inner="0" tooltip="" id="6" />
+              <Output name="onStopped" type="3" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="7" />
+              <Output name="Movement" type="0" type_size="1" nature="2" inner="0" tooltip="" id="8" />
+              <Output name="speech" type="3" type_size="1" nature="2" inner="0" tooltip="" id="9" />
             </Box>
-            <Box name="Apply Posture" id="1" localization="8" tooltip="Set directly all the joints of the robot in the asked posture." x="120" y="210">
+            <Box name="Apply Posture" id="1" localization="8" tooltip="Set directly all the joints of the robot in the asked posture." x="114" y="179">
               <bitmap>media/images/box/movement/setRobotPosture.png</bitmap>
               <script language="4">
                 <content>
@@ -1918,7 +1988,7 @@ class MyClass(GeneratedClass):
               <Parameter name="Speed (%)" inherits_from_parent="0" content_type="1" value="80" default_value="100" min="0" max="100" tooltip="Speed to go to the posture." id="7" />
               <Resource name="All motors" type="Lock" timeout="0" />
             </Box>
-            <Box name="Motion" id="7" localization="8" tooltip="" x="345" y="423">
+            <Box name="Motion" id="7" localization="8" tooltip="" x="177" y="678">
               <bitmap>media/images/box/box-python-script.png</bitmap>
               <script language="4">
                 <content>
@@ -2004,7 +2074,7 @@ class MyClass(GeneratedClass):
               <Output name="onConfusion" type="1" type_size="1" nature="2" inner="0" tooltip="" id="16" />
               <Output name="stopMove" type="1" type_size="1" nature="2" inner="0" tooltip="" id="17" />
             </Box>
-            <Box name="Say Text" id="9" localization="8" tooltip="Say the text received on its input." x="170" y="684">
+            <Box name="Say Text" id="9" localization="8" tooltip="Say the text received on its input." x="143" y="467">
               <bitmap>media/images/box/interaction/say.png</bitmap>
               <script language="4">
                 <content>
@@ -2060,7 +2130,7 @@ class MyClass(GeneratedClass):
               <Parameter name="Speed (%)" inherits_from_parent="1" content_type="1" value="100" default_value="100" min="50" max="200" tooltip="Changes the speed of the voice.&#x0A;&#x0A;Note: For a better effect, you can compensate this parameter with the voice&#x0A;shaping parameter. For example, if you want to increase by 20% the speed, you&#x0A;will have to decrease by 20% the voice shaping to keep a constant average&#x0A;speed." id="6" />
               <Resource name="Speech" type="Lock" timeout="0" />
             </Box>
-            <Box name="Stand" id="14" localization="8" tooltip="Set directly all the joints of the robot in the asked posture." x="901" y="576">
+            <Box name="Stand" id="14" localization="8" tooltip="Set directly all the joints of the robot in the asked posture." x="885" y="804">
               <bitmap>media/images/box/movement/setRobotPosture.png</bitmap>
               <script language="4">
                 <content>
@@ -16171,7 +16241,7 @@ class MyClass(GeneratedClass):
                 </BehaviorLayer>
               </Timeline>
             </Box>
-            <Box name="Zora_bored" id="4" localization="8" tooltip="" x="925" y="386">
+            <Box name="Zora_bored" id="4" localization="8" tooltip="" x="916" y="647">
               <bitmap>media/images/box/box-diagram.png</bitmap>
               <script language="4">
                 <content>
@@ -16182,6 +16252,7 @@ class MyClass(GeneratedClass):
               <Input name="activate" type="1" type_size="1" nature="2" inner="0" tooltip="This input has been automatically generated&#x0A;by converting several boxes into a single box." id="2" />
               <Input name="stop" type="1" type_size="1" nature="1" inner="0" tooltip="This input has been automatically generated&#x0A;by converting several boxes into a single box." id="3" />
               <Output name="finish" type="1" type_size="1" nature="1" inner="0" tooltip="" id="4" />
+              <Output name="started" type="1" type_size="1" nature="2" inner="0" tooltip="" id="5" />
               <Timeline enable="0">
                 <BehaviorLayer name="behavior_layer1">
                   <BehaviorKeyframe name="keyframe1" index="1">
@@ -16198,11 +16269,11 @@ class MyClass(GeneratedClass):
         self.ok = False
 
     def onLoad(self):
-        pass
+        self.ok = False
 
     def onUnload(self):
         #puts code for box cleanup here
-        pass
+        self.ok = False
 
     def onStart(self):
         pass
@@ -16212,11 +16283,14 @@ class MyClass(GeneratedClass):
         self.finish()
 
     def onInput_repeat(self):
+        while not self.ok:
+            sleep(0.5)
         if self.ok:
             sleep(int(random.randint(5,20)))
             self.signalsReceived()
 
     def onInput_activate(self):
+        self.ok = False
         sleep(20)
         self.ok = True
         self.signalsReceived()]]>
@@ -16230,7 +16304,7 @@ class MyClass(GeneratedClass):
                         <Output name="signalsReceived" type="1" type_size="1" nature="2" inner="0" tooltip="Signal sent when both inputs have been stimulated." id="6" />
                         <Output name="finish" type="1" type_size="1" nature="1" inner="0" tooltip="" id="7" />
                       </Box>
-                      <Box name="Repeat" id="4" localization="8" tooltip="Enter description here" x="384" y="76">
+                      <Box name="Repeat" id="4" localization="8" tooltip="Enter description here" x="332" y="39">
                         <bitmap>media/images/box/box-diagram.png</bitmap>
                         <script language="4">
                           <content>
@@ -20946,7 +21020,7 @@ class MyClass(GeneratedClass):
                           </BehaviorLayer>
                         </Timeline>
                       </Box>
-                      <Box name="Apply Posture" id="3" localization="8" tooltip="Set directly all the joints of the robot in the asked posture." x="812" y="58">
+                      <Box name="Apply Posture" id="3" localization="8" tooltip="Set directly all the joints of the robot in the asked posture." x="533" y="9">
                         <bitmap>media/images/box/movement/setRobotPosture.png</bitmap>
                         <script language="4">
                           <content>
@@ -21001,6 +21075,7 @@ class MyClass(GeneratedClass):
                       <Link inputowner="0" indexofinput="4" outputowner="3" indexofoutput="4" />
                       <Link inputowner="25" indexofinput="5" outputowner="0" indexofoutput="3" />
                       <Link inputowner="3" indexofinput="2" outputowner="4" indexofoutput="5" />
+                      <Link inputowner="0" indexofinput="5" outputowner="25" indexofoutput="6" />
                     </Diagram>
                   </BehaviorKeyframe>
                 </BehaviorLayer>
@@ -21009,9 +21084,9 @@ class MyClass(GeneratedClass):
             <Link inputowner="10" indexofinput="2" outputowner="2" indexofoutput="5" />
             <Link inputowner="2" indexofinput="2" outputowner="1" indexofoutput="4" />
             <Link inputowner="10" indexofinput="4" outputowner="1" indexofoutput="4" />
-            <Link inputowner="7" indexofinput="2" outputowner="10" indexofoutput="6" />
+            <Link inputowner="7" indexofinput="2" outputowner="10" indexofoutput="8" />
             <Link inputowner="7" indexofinput="3" outputowner="9" indexofoutput="4" />
-            <Link inputowner="9" indexofinput="2" outputowner="10" indexofoutput="7" />
+            <Link inputowner="9" indexofinput="2" outputowner="10" indexofoutput="9" />
             <Link inputowner="1" indexofinput="2" outputowner="0" indexofoutput="2" />
             <Link inputowner="0" indexofinput="4" outputowner="26" indexofoutput="4" />
             <Link inputowner="14" indexofinput="2" outputowner="8" indexofoutput="4" />
@@ -21049,6 +21124,10 @@ class MyClass(GeneratedClass):
             <Link inputowner="14" indexofinput="2" outputowner="20" indexofoutput="4" />
             <Link inputowner="4" indexofinput="3" outputowner="2" indexofoutput="5" />
             <Link inputowner="4" indexofinput="2" outputowner="14" indexofoutput="4" />
+            <Link inputowner="10" indexofinput="5" outputowner="4" indexofoutput="4" />
+            <Link inputowner="10" indexofinput="6" outputowner="4" indexofoutput="5" />
+            <Link inputowner="10" indexofinput="5" outputowner="14" indexofoutput="4" />
+            <Link inputowner="10" indexofinput="6" outputowner="9" indexofoutput="4" />
           </Diagram>
         </BehaviorKeyframe>
       </BehaviorLayer>
