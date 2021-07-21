@@ -678,11 +678,16 @@ zora = {}
 
 
 def get_data(cmd, ins):
-    response = urllib2.urlopen('http://aidabot.ddns.net/api?pass=123abc&' + cmd + urllib.quote(str(ins)))
-    data = json.load(response)  # type: dict
-    # print data
-    assert isinstance(data, dict)
-    return data
+    try:
+        response = urllib2.urlopen('http://aidabot.ddns.net/api?pass=123abc&' + cmd + urllib.quote(str(ins)))
+        data = json.load(response)  # type: dict
+        # print data
+        assert isinstance(data, dict)
+        return data
+    except:
+        session_reset()
+        setMessage('ERROR_MSG')
+        return {}
 
 
 def getIntent(msg):
@@ -1839,12 +1844,13 @@ def cycle(user_input):
         intent = getIntent(msg)[0]
         if intent != 'fallback':
             session['level'] = 0
-            if session['intent'].get('level') is not None:
-                session['intent']['level'] = 0
-            if session['intent'].get('homonyms_list') is not None:
-                del session['intent']['homonyms_list']
-            if session['intent'].get('items_list') is not None:
-                del session['intent']['items_list']
+            # if session['intent'].get('level') is not None:
+            #    session['intent']['level'] = 0
+            # if session['intent'].get('homonyms_list') is not None:
+            #    del session['intent']['homonyms_list']
+            # if session['intent'].get('items_list') is not None:
+            #    del session['intent']['items_list']
+            session_reset()
             intent_verify(msg)
             return
         if session['intent']['name'] == 'count':
@@ -1910,7 +1916,7 @@ class MyClass(GeneratedClass):
 
     def onInput_onStart(self, s):
         while not self.ready:
-            sleep(0.1)
+            sleep(0.5)
         cycle(str(s))
         self.speech(str(zora['answer']))
         self.Movement(zora['action'])
@@ -1939,7 +1945,7 @@ class MyClass(GeneratedClass):
               <Input name="bored_stopped" type="1" type_size="1" nature="1" inner="0" tooltip="" id="5" />
               <Input name="bored_starded" type="1" type_size="1" nature="1" inner="0" tooltip="" id="6" />
               <Output name="onStopped" type="3" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="7" />
-              <Output name="Movement" type="0" type_size="1" nature="2" inner="0" tooltip="" id="8" />
+              <Output name="Movement" type="3" type_size="1" nature="2" inner="0" tooltip="" id="8" />
               <Output name="speech" type="3" type_size="1" nature="2" inner="0" tooltip="" id="9" />
             </Box>
             <Box name="Apply Posture" id="1" localization="8" tooltip="Set directly all the joints of the robot in the asked posture." x="114" y="179">
@@ -16286,7 +16292,7 @@ class MyClass(GeneratedClass):
         while not self.ok:
             sleep(0.5)
         if self.ok:
-            sleep(int(random.randint(5,20)))
+            sleep(int(random.randint(3,7)))
             self.signalsReceived()
 
     def onInput_activate(self):
@@ -16304,7 +16310,7 @@ class MyClass(GeneratedClass):
                         <Output name="signalsReceived" type="1" type_size="1" nature="2" inner="0" tooltip="Signal sent when both inputs have been stimulated." id="6" />
                         <Output name="finish" type="1" type_size="1" nature="1" inner="0" tooltip="" id="7" />
                       </Box>
-                      <Box name="Repeat" id="4" localization="8" tooltip="Enter description here" x="332" y="39">
+                      <Box name="Actions" id="4" localization="8" tooltip="Enter description here" x="332" y="39">
                         <bitmap>media/images/box/box-diagram.png</bitmap>
                         <script language="4">
                           <content>
@@ -16312,7 +16318,7 @@ class MyClass(GeneratedClass):
                           </content>
                         </script>
                         <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
-                        <Input name="LittleBowAndSpreadArms_01_onStart" type="1" type_size="1" nature="2" inner="0" tooltip="This input has been automatically generated&#x0A;by converting several boxes into a single box." id="2" />
+                        <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="" id="2" />
                         <Input name="stop" type="1" type_size="1" nature="3" inner="0" tooltip="" id="3" />
                         <Output name="onStopped" type="1" type_size="1" nature="2" inner="0" tooltip="This output has been automatically generated&#x0A;by converting several boxes into a single box." id="4" />
                         <Output name="stopped" type="1" type_size="1" nature="1" inner="0" tooltip="" id="5" />
@@ -16320,7 +16326,7 @@ class MyClass(GeneratedClass):
                           <BehaviorLayer name="behavior_layer1">
                             <BehaviorKeyframe name="keyframe1" index="1">
                               <Diagram>
-                                <Box name="Apply Posture" id="3" localization="8" tooltip="Set directly all the joints of the robot in the asked posture." x="1072" y="113">
+                                <Box name="Apply Posture" id="3" localization="8" tooltip="Set directly all the joints of the robot in the asked posture." x="1032" y="115">
                                   <bitmap>media/images/box/movement/setRobotPosture.png</bitmap>
                                   <script language="4">
                                     <content>
@@ -20991,8 +20997,6 @@ class MyClass(GeneratedClass):
                                   <Resource name="Standing" type="Lock" timeout="1" />
                                   <Resource name="All motors" type="Lock" timeout="1" />
                                 </Box>
-                                <Link inputowner="1" indexofinput="2" outputowner="0" indexofoutput="2" />
-                                <Link inputowner="0" indexofinput="4" outputowner="3" indexofoutput="4" />
                                 <Link inputowner="19" indexofinput="2" outputowner="1" indexofoutput="5" />
                                 <Link inputowner="3" indexofinput="2" outputowner="19" indexofoutput="4" />
                                 <Link inputowner="29" indexofinput="2" outputowner="1" indexofoutput="7" />
@@ -21015,6 +21019,8 @@ class MyClass(GeneratedClass):
                                 <Link inputowner="3" indexofinput="2" outputowner="11" indexofoutput="4" />
                                 <Link inputowner="13" indexofinput="2" outputowner="1" indexofoutput="11" />
                                 <Link inputowner="3" indexofinput="2" outputowner="13" indexofoutput="4" />
+                                <Link inputowner="0" indexofinput="4" outputowner="3" indexofoutput="4" />
+                                <Link inputowner="1" indexofinput="2" outputowner="0" indexofoutput="2" />
                               </Diagram>
                             </BehaviorKeyframe>
                           </BehaviorLayer>

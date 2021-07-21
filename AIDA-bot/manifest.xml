@@ -1,8 +1,11 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<package uuid="aida-bot-eeb321" version="0.0.0" installOnlyAtStartup="false">
+<package installOnlyAtStartup="false" uuid="aida-bot-eeb321" version="0.0.0">
  <names>
   <name lang="en_US">AIDA-Bot</name>
  </names>
+ <supportedLanguages>
+  <language>en_US</language>
+ </supportedLanguages>
  <descriptionLanguages>
   <language>en_US</language>
  </descriptionLanguages>
@@ -16,6 +19,7 @@
    <descriptions>
     <description lang="en_US">A Conversational Agent to Explore Scholarly Knowledge Graphs</description>
    </descriptions>
+   <autonomous/>
    <permissions/>
   </behaviorContent>
  </contents>
