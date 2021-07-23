@@ -19,7 +19,6 @@
    <descriptions>
     <description lang="en_US">A Conversational Agent to Explore Scholarly Knowledge Graphs</description>
    </descriptions>
-   <autonomous/>
    <permissions/>
   </behaviorContent>
  </contents>
