@@ -16248,7 +16248,7 @@ class MyClass(GeneratedClass):
               </Timeline>
             </Box>
             <Box name="Zora_bored" id="4" localization="8" tooltip="" x="960" y="534">
-              <bitmap>media/images/box/box-diagram.png</bitmap>
+              <bitmap>media/images/box/bored.png</bitmap>
               <script language="4">
                 <content>
                   <![CDATA[]]>
