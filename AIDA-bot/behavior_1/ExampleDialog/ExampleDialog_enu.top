@@ -1,0 +1,5 @@
+topic: ~ExampleDialog()
+language: enu
+
+u:(_*) $string = $1 $stop_bored=1 
+
