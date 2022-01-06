@@ -14,7 +14,7 @@
         <Timeline enable="0">
             <BehaviorLayer name="behavior_layer1">
                 <BehaviorKeyframe name="keyframe1" index="1">
-                    <Diagram scale="237.841">
+                    <Diagram scale="168.179">
                         <Box name="AIDA-bot" id="10" localization="8" tooltip="This box contains a basic python script and can be used to create any python script box you would like.&#x0A;&#x0A;To edit its script, double-click on it." x="475" y="27">
                             <bitmap>media/images/box/box-python-script.png</bitmap>
                             <script language="4">
