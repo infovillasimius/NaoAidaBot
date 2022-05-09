@@ -137,7 +137,47 @@ templates = {
     'DSC_NO_RESULT_MSG': 'Your search for ${ins} got no result. You need to try again. What is the name of the author '
                          'or conference you want to know about?',
     'DESCRIBE_INSTANCE_MSG': 'What is the name of the author or conference you want to know about?',
-    'DESCRIBE_CONFIRM_MSG': 'Do you want to know something about ${ins}?'
+    'DESCRIBE_CONFIRM_MSG': 'Do you want to know something about ${ins}?',
+
+	'COMPARE_FIRST_INSTANCE': 'What is the <b> name </b> of the <b> author </b> or <b> conference </b> or <b> '
+							  'organization </b> that you want to use as the first term for the comparison?',
+	'COMPARE_SECOND_INSTANCE': [
+		'What is the <b> name </b> of the <b> ${obj} </b> that you want to use as the second term for the '
+		'comparison?',
+		'What is the <b> name </b> of the <b> ${obj} </b> that you want to compare to ${ins}?'],
+	'COMPARE_CONFIRM_MSG': 'Do you want to compare ${ins} to ${ins2}?',
+	'COMPARE_TOO_GENERIC_FIRST_MSG': 'Your search for <b>${ins}</b> got ${results}. You need to try again and '
+									 'to be more specific. What is the <b> name </b> of the <b> author </b> '
+									 'or <b> conference </b> or <b> organization </b> that you want to use as '
+									 'the first term for the comparison? <br/>(for organizations you can '
+									 'enter the grid id)',
+	'COMPARE_TOO_GENERIC_SECOND_MSG': 'Your search for <b>${ins}</b> got ${results}. You need to try again '
+									  'and to be more specific. What is the <b> name </b> of the <b> ${obj} '
+									  '</b> that you want to use as the second term for the comparison? '
+									  '<br/>(for organizations you can enter the grid id)',
+	'COMPARE_NO_RESULT_FIRST_MSG': 'Your search for <b>${ins}</b> got no result. You need to try again. What '
+								   'is the <b> name </b> of the <b> author </b> or <b> conference </b> or <b> '
+								   'organization </b> that you want to use as the first term for the '
+								   'comparison? <br/>(for organizations you can enter the grid id)',
+	'COMPARE_NO_RESULT_SECOND_MSG': 'Your search for <b>${ins}</b> got no result. You need to try again. What '
+									'is the <b> name </b> of the <b> ${obj} </b> that you want to use as the '
+									'second term for the comparison? <br/>(for organizations you can enter the '
+									'grid id)',
+	'COMPARE_SAME_OBJ_MSG': "Hey, it's the same <b>${obj1}</b>! You can try two different ones or ask for "
+							"Help. <br/>What would you like to try?",
+	'COMPARE_WRONG_PAIR_MSG': "Hey, I can't compare <b>${obj1}</b> to <b>${obj2}</b>! You can try two "
+							  "entities of the same type or ask for Help. <br/>What would you like to try?",
+	'COMPARE_AUTHORS_MSG': "<b>${author1}</b> has ${publications}, ${citations} and ${h_index} <b>${"
+						   "author2}</b>. ${topics}<br/>You can ask to perform another query on the data "
+						   "contained in the AIDA database or ask for Help. <br/>What would you like to try?",
+	'COMPARE_CONFERENCE_MSG': "${conf1} started ${years} ${conf2} and has ${citations} citations in the last "
+							  "5 years. ${name1} also has ${h5_index} ${name2}. ${topics}<br/>You can ask to "
+							  "perform another query on the data contained in the AIDA database or ask for "
+							  "Help. <br/>What would you like to try?",
+	'COMPARE_ORGANIZATIONS_MESSAGE': "${org1} has ${publications} and ${citations} in the last 5 years. It "
+									 "also has ${h5_index} ${org2}. ${topics}<br/>You can ask to perform "
+									 "another query on the data contained in the AIDA database or ask for "
+									 "Help. <br/>What would you like to try?"
 }
 
 count_dict = {
