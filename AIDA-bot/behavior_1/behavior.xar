@@ -70,7 +70,7 @@ templates = {
         'You can ask a query starting with count, list or describe'],
     'GOODBYE_MSG': ['Goodbye!', 'Bye!', 'See you later!'],
     'REFLECTOR_MSG': 'You just triggered ${intent}',
-    'FALLBACK_MSG': 'Sorry, I don\'t know that. You can ask a query starting with count, list or describe, Please try again.',
+    'FALLBACK_MSG': "Sorry, I don't know that. Please try again. You can enter one of the activation keys (count, list, describe or compare) to start the wizard that will help you formulate your query.",
     'ERROR_MSG': 'Sorry, there was an error. Please try again.',
 
     'HOMONYMS_MSG': 'I found different homonyms: ${msg} ',
